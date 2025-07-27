@@ -4,19 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Split the D – First Sip Edition</title>
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
     <h1>Split the D</h1>
-    <p>Upload your post-sip photo. Tap the foam line. Tap the 'D' in Drinks.</p>
+    <p>Upload your post-sip photo. We’ll handle the rest.</p>
 
-    <!-- Branded Pint Image -->
-    <img src="assets/designated-glass-clean-overlay.png" id="heroImage" alt="Designated Drinks Pint" />
+    <!-- Loader -->
+    <div id="loadingScreen" style="display: none;">
+      <img src="assets/pint-fill-loader.gif" alt="Analyzing..." class="loader" />
+      <p>Analyzing sip… calibrating foam line… locating the D…</p>
+    </div>
 
-    <!-- File Upload + Scoring -->
-    <input type="file" id="imageUpload" accept="image/*" />
-    <canvas id="canvas"></canvas>
+    <!-- Upload -->
+    <label for="imageUpload" class="uploadBtn">Upload Sip Photo</label>
+    <input type="file" id="imageUpload" accept="image/*" hidden />
+
+    <!-- Image Preview + Canvas -->
+    <canvas id="canvas" style="display: none;"></canvas>
+
+    <!-- Score -->
     <div id="scoreContainer"></div>
   </div>
 
