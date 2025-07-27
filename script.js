@@ -1,4 +1,4 @@
-const imageUpload = document.getElementById("imageUpload");
+const imageUpload = document.getElementById("imageUpload"); 
 const analyzeBtn = document.getElementById("analyzeBtn");
 const canvas = document.getElementById("outputCanvas");
 const ctx = canvas.getContext("2d");
