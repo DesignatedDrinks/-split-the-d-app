@@ -1,56 +1,90 @@
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-let image = new Image();
-let points = [];
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const imageInput = document.getElementById("imageUpload");
+const loadingScreen = document.getElementById("loadingScreen");
+const scoreContainer = document.getElementById("scoreContainer");
 
-// Handle user image upload
-document.getElementById('imageUpload').addEventListener('change', function (e) {
-  const file = e.target.files[0];
+imageInput.addEventListener("change", async function () {
+  const file = imageInput.files[0];
   if (!file) return;
 
   const reader = new FileReader();
   reader.onload = function (event) {
-    image.onload = () => {
-      // Set canvas size to match uploaded image
-      canvas.width = image.width;
-      canvas.height = image.height;
+    const img = new Image();
+    img.onload = async function () {
+      // Set canvas size
+      canvas.width = img.width;
+      canvas.height = img.height;
 
-      // Clear and draw the image
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(image, 0, 0);
+      // Draw image to canvas
+      ctx.drawImage(img, 0, 0);
 
-      // Reset points and score
-      points = [];
-      document.getElementById('scoreContainer').textContent = '';
+      // Show loader
+      canvas.style.display = "none";
+      scoreContainer.textContent = "";
+      loadingScreen.style.display = "flex";
+
+      // Give the illusion of analysis time
+      setTimeout(() => {
+        // Simulate foam line detection
+        const foamY = detectFoamLine(img);
+
+        // Simulate D location
+        const dY = 100;
+
+        const score = Math.max(0, 100 - Math.abs(foamY - dY));
+        let message = "";
+
+        if (score > 95) {
+          message = "Surgical sip! 🔪🍺";
+        } else if (score > 85) {
+          message = "Clean hit! 👌";
+        } else if (score > 70) {
+          message = "Respectable line. 👏";
+        } else if (score > 50) {
+          message = "Close call. 👀";
+        } else {
+          message = "You missed the D entirely. 🫣";
+        }
+
+        // Display results
+        loadingScreen.style.display = "none";
+        canvas.style.display = "block";
+        scoreContainer.innerHTML = `Score: ${Math.round(score)}<br>${message}`;
+      }, 2000); // 2 second delay
     };
-    image.src = event.target.result;
+    img.src = event.target.result;
   };
   reader.readAsDataURL(file);
 });
 
-// Handle clicks on canvas (for foam + D point)
-canvas.addEventListener('click', function (e) {
-  if (points.length >= 2) return;
+function detectFoamLine(img) {
+  const tempCanvas = document.createElement("canvas");
+  const tempCtx = tempCanvas.getContext("2d");
+  tempCanvas.width = img.width;
+  tempCanvas.height = img.height;
+  tempCtx.drawImage(img, 0, 0);
+  const imageData = tempCtx.getImageData(0, 0, img.width, img.height).data;
 
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-  points.push({ x, y });
+  for (let y = 0; y < img.height; y++) {
+    let brightnessSum = 0;
+    for (let x = 0; x < img.width; x++) {
+      const index = (y * img.width + x) * 4;
+      const r = imageData[index];
+      const g = imageData[index + 1];
+      const b = imageData[index + 2];
+      const brightness = (r + g + b) / 3;
+      brightnessSum += brightness;
+    }
 
-  // Draw dot
-  ctx.beginPath();
-  ctx.arc(x, y, 5, 0, 2 * Math.PI);
-  ctx.fillStyle = points.length === 1 ? 'yellow' : 'red';
-  ctx.fill();
+    const avgBrightness = brightnessSum / img.width;
 
-  // Score after second point
-  if (points.length === 2) {
-    const dy = Math.abs(points[0].y - points[1].y);
-    const score = Math.max(0, 100 - dy);
-    let message = '';
+    // Assume foam is the first really bright row
+    if (avgBrightness > 200) {
+      return y;
+    }
+  }
 
-    if (score > 95) {
-      message = 'Surgical sip! 🔪🍺';
-    } else if (score > 85) {
-      message = 'Clean hit! 👌';
-    } els
+  // Default fallback
+  return img.height / 2;
+}
