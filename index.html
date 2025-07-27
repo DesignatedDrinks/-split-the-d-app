@@ -4,28 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Split the D – First Sip Edition</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <div class="container">
     <h1>Split the D</h1>
-    <p>Upload your post-sip photo. We’ll handle the rest.</p>
+    <p>Upload your pour. Line it up with the D. Let’s see if you nailed it.</p>
 
-    <!-- Loader -->
-    <div id="loadingScreen" style="display: none;">
-      <img src="assets/pint-fill-loader.gif" alt="Analyzing..." class="loader" />
-      <p>Analyzing sip… calibrating foam line… locating the D…</p>
-    </div>
+    <input type="file" id="imageUpload" accept="image/*" />
+    <canvas id="outputCanvas"></canvas>
 
-    <!-- Upload -->
-    <label for="imageUpload" class="uploadBtn">Upload Sip Photo</label>
-    <input type="file" id="imageUpload" accept="image/*" hidden />
-
-    <!-- Image Preview + Canvas -->
-    <canvas id="canvas" style="display: none;"></canvas>
-
-    <!-- Score -->
-    <div id="scoreContainer"></div>
+    <button id="analyzeBtn">Analyze Pour</button>
+    <div id="resultText"></div>
   </div>
 
   <script src="script.js"></script>
