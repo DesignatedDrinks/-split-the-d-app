@@ -7,20 +7,24 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app">
-    <h1>Split the <span class="highlight">D</span></h1>
-    <p class="sub">Take your first drink. Snap a pic. Did you nail the D?</p>
-
+  <div class="container">
+    <h1>Split the D</h1>
+    <p>Take your first drink. Upload the proof. Line it up with the D. Score it.</p>
     <input type="file" id="imageUpload" accept="image/*" />
     <input type="text" id="beerName" placeholder="What beer are you drinking?" />
 
-    <button id="analyzeBtn">Split It</button>
-
-    <div class="image-result">
-      <img id="uploadedImage" src="" alt="Uploaded Beer Pic" />
+    <div class="image-wrapper">
+      <canvas id="imageCanvas"></canvas>
+      <img id="uploadedImage" src="" alt="Uploaded Pour" style="display: none;" />
+      <img id="overlay" src="assets/drinks-overlay.png" alt="Logo Overlay" />
     </div>
 
-    <div id="result" class="result-msg"></div>
+    <div id="tap-instruction" style="display:none;">
+      <p>📍 Tap where the beer line is.</p>
+    </div>
+
+    <button id="analyzeBtn">Analyze Pour</button>
+    <div id="result"></div>
   </div>
 
   <footer>
