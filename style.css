@@ -28,40 +28,45 @@ p {
   margin-bottom: 30px;
 }
 
-#heroImage {
-  width: 100%;
-  max-width: 320px;
-  border-radius: 10px;
-  margin-bottom: 30px;
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
-}
-
-input[type="file"] {
+.uploadBtn {
+  display: inline-block;
   background-color: #f9cc50;
   color: #121212;
-  border: none;
-  padding: 12px 24px;
   font-weight: bold;
+  padding: 12px 24px;
   border-radius: 6px;
   cursor: pointer;
-  margin-top: 10px;
   transition: background-color 0.2s ease-in-out;
+  margin-bottom: 20px;
 }
 
-input[type="file"]:hover {
+.uploadBtn:hover {
   background-color: #ffe670;
 }
 
-canvas {
-  margin-top: 30px;
+#canvas {
   max-width: 100%;
   border: 2px solid #f5f5f5;
-  border-radius: 8px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+#loadingScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.loader {
+  width: 120px;
+  margin-bottom: 10px;
 }
 
 #scoreContainer {
+  margin-top: 30px;
   font-size: 1.6em;
-  margin-top: 25px;
   font-weight: bold;
   color: #f9cc50;
 }
