@@ -2,20 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Split the D – First Sip Edition</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Split the D - Live Camera Overlay</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="container">
+  <div id="app">
     <h1>Split the D</h1>
-    <p>Upload your pour. Line it up with the D. Let’s see if you nailed it.</p>
+    <p class="subtitle">Line up your pour with the D. Let's see if you nailed it.</p>
+    
+    <video id="video" autoplay playsinline></video>
+    <img id="overlay" src="assets/drinks-overlay.png" alt="Logo Overlay" />
 
-    <input type="file" id="imageUpload" accept="image/*" />
-    <canvas id="outputCanvas"></canvas>
+    <div class="input-container">
+      <input type="text" id="beerName" placeholder="What beer are you drinking?" />
+      <button id="capture">Submit Pour</button>
+    </div>
 
-    <button id="analyzeBtn">Analyze Pour</button>
-    <div id="resultText"></div>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <div id="result"></div>
   </div>
 
   <script src="script.js"></script>
