@@ -1,72 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600&display=swap');
-
 body {
-  margin: 0;
-  padding: 0;
-  background-color: #121212;
+  font-family: 'Segoe UI', sans-serif;
+  background: #1b1b1b;
   color: #f5f5f5;
-  font-family: 'Inter', sans-serif;
   text-align: center;
+  margin: 0;
+  padding: 2rem;
 }
 
 .container {
   max-width: 600px;
-  margin: 0 auto;
-  padding: 40px 20px;
+  margin: auto;
+  background: #2c2c2c;
+  padding: 2rem;
+  border-radius: 12px;
 }
 
-h1 {
-  font-family: 'Anton', sans-serif;
-  font-size: 3em;
-  color: #f9cc50;
-  margin-bottom: 10px;
+input[type="file"] {
+  margin-bottom: 1rem;
 }
 
-p {
-  font-size: 1.1em;
-  color: #cccccc;
-  margin-bottom: 30px;
-}
-
-.uploadBtn {
-  display: inline-block;
-  background-color: #f9cc50;
-  color: #121212;
-  font-weight: bold;
-  padding: 12px 24px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-  margin-bottom: 20px;
-}
-
-.uploadBtn:hover {
-  background-color: #ffe670;
-}
-
-#canvas {
+canvas {
   max-width: 100%;
-  border: 2px solid #f5f5f5;
-  border-radius: 10px;
-  margin-top: 20px;
+  border: 2px solid #444;
+  margin-top: 1rem;
+  border-radius: 6px;
 }
 
-#loadingScreen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
+button {
+  margin-top: 1rem;
+  padding: 0.7rem 1.5rem;
+  font-size: 16px;
+  border: none;
+  background: #ffcc00;
+  color: #000;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.loader {
-  width: 120px;
-  margin-bottom: 10px;
-}
-
-#scoreContainer {
-  margin-top: 30px;
-  font-size: 1.6em;
+#resultText {
+  margin-top: 1rem;
+  font-size: 18px;
   font-weight: bold;
-  color: #f9cc50;
 }
