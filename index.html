@@ -7,20 +7,25 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>Split the D</h1>
-    <p>Take your first drink. Snap a pic. Did you nail the D?</p>
+  <div class="app">
+    <h1>Split the <span class="highlight">D</span></h1>
+    <p class="sub">Take your first drink. Snap a pic. Did you nail the D?</p>
 
     <input type="file" id="imageUpload" accept="image/*" />
     <input type="text" id="beerName" placeholder="What beer are you drinking?" />
-    <button id="submitBtn">Split It</button>
 
-    <div class="preview">
-      <img id="uploadedImage" src="" alt="Your uploaded pour" style="display: none;" />
+    <button id="analyzeBtn">Split It</button>
+
+    <div class="image-result">
+      <img id="uploadedImage" src="" alt="Uploaded Beer Pic" />
     </div>
 
-    <div id="resultText"></div>
+    <div id="result" class="result-msg"></div>
   </div>
+
+  <footer>
+    <a href="https://designateddrinks.github.io" target="_blank">designateddrinks.github.io</a>
+  </footer>
 
   <script src="script.js"></script>
 </body>
