@@ -6,6 +6,16 @@ body {
   margin: 0;
   padding: 0;
 }
+#hero {
+  margin-top: 20px;
+}
+
+#heroImage {
+  max-width: 300px;
+  width: 100%;
+  height: auto;
+  opacity: 0.9;
+}
 
 .container {
   padding: 20px;
