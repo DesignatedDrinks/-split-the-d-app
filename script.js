@@ -1,74 +1,85 @@
 const imageUpload = document.getElementById("imageUpload");
-const beerName = document.getElementById("beerName");
-const imageCanvas = document.getElementById("imageCanvas");
-const ctx = imageCanvas.getContext("2d");
-const result = document.getElementById("result");
+const beerNameInput = document.getElementById("beerName");
+const canvas = document.getElementById("imageCanvas");
+const ctx = canvas.getContext("2d");
+const overlay = document.getElementById("overlay");
 const analyzeBtn = document.getElementById("analyzeBtn");
+const result = document.getElementById("result");
+const tapInstruction = document.getElementById("tap-instruction");
 
-let uploadedImg = new Image();
+let uploadedImage = null;
+let beerLineY = null;
 
+// Load image into canvas
 imageUpload.addEventListener("change", (e) => {
   const file = e.target.files[0];
+  if (!file) return;
+
   const reader = new FileReader();
   reader.onload = function (event) {
-    uploadedImg.onload = function () {
-      imageCanvas.width = uploadedImg.width;
-      imageCanvas.height = uploadedImg.height;
-      ctx.drawImage(uploadedImg, 0, 0);
+    const img = new Image();
+    img.onload = function () {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+
+      overlay.onload = () => {
+        ctx.drawImage(overlay, 0, 0, img.width, img.height);
+      };
+
+      uploadedImage = img;
+      beerLineY = null;
+      result.innerHTML = "";
+      tapInstruction.style.display = "block";
     };
-    uploadedImg.src = event.target.result;
+    img.src = event.target.result;
   };
-  if (file) reader.readAsDataURL(file);
+  reader.readAsDataURL(file);
 });
 
+// Tap to mark beer line
+canvas.addEventListener("click", (e) => {
+  if (!uploadedImage) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const y = e.clientY - rect.top;
+  beerLineY = y;
+
+  // Draw line where user tapped
+  ctx.drawImage(uploadedImage, 0, 0);
+  ctx.drawImage(overlay, 0, 0, canvas.width, canvas.height);
+  ctx.beginPath();
+  ctx.moveTo(0, beerLineY);
+  ctx.lineTo(canvas.width, beerLineY);
+  ctx.strokeStyle = "#00FF88";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+});
+
+// Analyze button
 analyzeBtn.addEventListener("click", () => {
-  if (!uploadedImg.src) {
-    result.innerHTML = "Upload a photo first!";
+  if (!uploadedImage || beerLineY === null) {
+    result.innerHTML = "📍 Please upload and tap your beer line.";
     return;
   }
 
-  // --- Semi-Auto Scoring ---
-  // Sample row near the center to find the average brightness (estimation of beer line)
-  const yStart = Math.floor(imageCanvas.height * 0.6);
-  const yEnd = Math.floor(imageCanvas.height * 0.8);
-  const xMid = Math.floor(imageCanvas.width / 2);
-
-  let bestY = 0;
-  let maxContrast = 0;
-
-  for (let y = yStart; y < yEnd; y++) {
-    const pixel = ctx.getImageData(xMid, y, 1, 1).data;
-    const brightness = (pixel[0] + pixel[1] + pixel[2]) / 3;
-
-    const pixelAbove = ctx.getImageData(xMid, y - 5, 1, 1).data;
-    const brightnessAbove = (pixelAbove[0] + pixelAbove[1] + pixelAbove[2]) / 3;
-
-    const contrast = Math.abs(brightness - brightnessAbove);
-
-    if (contrast > maxContrast) {
-      maxContrast = contrast;
-      bestY = y;
-    }
-  }
-
-  // Expected D-line position (roughly where overlay would sit)
-  const expectedY = Math.floor(imageCanvas.height * 0.72);
-  const distance = Math.abs(bestY - expectedY);
-  const score = Math.max(0, 100 - distance); // crude % match
+  const targetY = canvas.height * 0.67; // Position of the line in the "D" (~2/3 down)
+  const diff = Math.abs(beerLineY - targetY);
+  const threshold = canvas.height * 0.03; // ~3% margin
 
   let message = "";
-  if (score > 90) {
-    message = `🎯 Bullseye. Nailed it. (${score}%)`;
-  } else if (score > 75) {
-    message = `🔥 Close enough to count. (${score}%)`;
-  } else if (score > 50) {
-    message = `🥴 Almost... but not quite. (${score}%)`;
+  if (diff <= threshold) {
+    message = `🎯 Nailed it! You lined up the D.`;
+  } else if (diff <= threshold * 2) {
+    message = `😎 Not bad. You're close to the D.`;
   } else {
-    message = `🫣 Yikes. Not even close. (${score}%)`;
+    message = `👀 Way off. You missed the D.`;
   }
 
-  result.innerHTML = `
-    <strong>${beerName.value || "Your beer"}</strong><br/>
-    ${message}
-  `;
+  const beerName = beerNameInput.value.trim();
+  if (beerName) {
+    message += `<br/><span style="font-size: 0.9em; opacity: 0.8;">🍺 Beer: ${beerName}</span>`;
+  }
+
+  result.innerHTML = message;
 });
