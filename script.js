@@ -1,50 +1,74 @@
-// script.js
-
 const imageUpload = document.getElementById("imageUpload");
-const uploadedImage = document.getElementById("uploadedImage");
-const overlay = document.getElementById("overlay");
-const analyzeBtn = document.getElementById("analyzeBtn");
+const beerName = document.getElementById("beerName");
+const imageCanvas = document.getElementById("imageCanvas");
+const ctx = imageCanvas.getContext("2d");
 const result = document.getElementById("result");
-const beerNameInput = document.getElementById("beerName");
-const canvas = document.getElementById("imageCanvas");
-const ctx = canvas.getContext("2d");
+const analyzeBtn = document.getElementById("analyzeBtn");
+
+let uploadedImg = new Image();
 
 imageUpload.addEventListener("change", (e) => {
   const file = e.target.files[0];
-  if (!file) return;
   const reader = new FileReader();
   reader.onload = function (event) {
-    uploadedImage.src = event.target.result;
-    uploadedImage.onload = () => {
-      overlay.style.display = "block";
-      canvas.width = uploadedImage.width;
-      canvas.height = uploadedImage.height;
-      drawOverlay();
+    uploadedImg.onload = function () {
+      imageCanvas.width = uploadedImg.width;
+      imageCanvas.height = uploadedImg.height;
+      ctx.drawImage(uploadedImg, 0, 0);
     };
+    uploadedImg.src = event.target.result;
   };
-  reader.readAsDataURL(file);
+  if (file) reader.readAsDataURL(file);
 });
 
-function drawOverlay() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(uploadedImage, 0, 0);
-  ctx.drawImage(overlay, 0, 0, uploadedImage.width, uploadedImage.height);
-}
-
 analyzeBtn.addEventListener("click", () => {
-  const beerName = beerNameInput.value.trim();
-  if (!uploadedImage.src) {
-    result.innerText = "Upload your photo first.";
+  if (!uploadedImg.src) {
+    result.innerHTML = "Upload a photo first!";
     return;
   }
-  const analysisScore = Math.random(); // Simulated score for now
-  let message = "";
-  if (analysisScore > 0.8) {
-    message = `🔥 Nailed it${beerName ? ", drinking " + beerName : ""}! You Split the D.`;
-  } else if (analysisScore > 0.5) {
-    message = `😎 Not bad${beerName ? ", drinking " + beerName : ""}. You're close to the D.`;
-  } else {
-    message = `😬 Missed it${beerName ? ", drinking " + beerName : ""}. Better luck next time.`;
+
+  // --- Semi-Auto Scoring ---
+  // Sample row near the center to find the average brightness (estimation of beer line)
+  const yStart = Math.floor(imageCanvas.height * 0.6);
+  const yEnd = Math.floor(imageCanvas.height * 0.8);
+  const xMid = Math.floor(imageCanvas.width / 2);
+
+  let bestY = 0;
+  let maxContrast = 0;
+
+  for (let y = yStart; y < yEnd; y++) {
+    const pixel = ctx.getImageData(xMid, y, 1, 1).data;
+    const brightness = (pixel[0] + pixel[1] + pixel[2]) / 3;
+
+    const pixelAbove = ctx.getImageData(xMid, y - 5, 1, 1).data;
+    const brightnessAbove = (pixelAbove[0] + pixelAbove[1] + pixelAbove[2]) / 3;
+
+    const contrast = Math.abs(brightness - brightnessAbove);
+
+    if (contrast > maxContrast) {
+      maxContrast = contrast;
+      bestY = y;
+    }
   }
-  result.innerText = message;
+
+  // Expected D-line position (roughly where overlay would sit)
+  const expectedY = Math.floor(imageCanvas.height * 0.72);
+  const distance = Math.abs(bestY - expectedY);
+  const score = Math.max(0, 100 - distance); // crude % match
+
+  let message = "";
+  if (score > 90) {
+    message = `🎯 Bullseye. Nailed it. (${score}%)`;
+  } else if (score > 75) {
+    message = `🔥 Close enough to count. (${score}%)`;
+  } else if (score > 50) {
+    message = `🥴 Almost... but not quite. (${score}%)`;
+  } else {
+    message = `🫣 Yikes. Not even close. (${score}%)`;
+  }
+
+  result.innerHTML = `
+    <strong>${beerName.value || "Your beer"}</strong><br/>
+    ${message}
+  `;
 });
