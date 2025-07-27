@@ -3,34 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Split the D — First Drink Edition</title>
+  <title>Split the D</title>
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>Split the D</h1>
-      <p class="tagline">Take your first drink. Snap a pic. Did you nail the D?</p>
-    </header>
+    <h1>Split the D</h1>
+    <p>Take your first drink. Snap a pic. Did you nail the D?</p>
 
-    <div class="upload-section">
-      <input type="file" id="imageUpload" accept="image/*" />
-      <input type="text" id="beerName" placeholder="What beer are you drinking?" />
-      <button id="analyzeBtn">Split It</button>
+    <input type="file" id="imageUpload" accept="image/*" />
+    <input type="text" id="beerName" placeholder="What beer are you drinking?" />
+    <button id="submitBtn">Split It</button>
+
+    <div class="preview">
+      <img id="uploadedImage" src="" alt="Your uploaded pour" style="display: none;" />
     </div>
 
-    <div class="image-wrapper">
-      <img id="uploadedImage" src="" alt="Your Drink" />
-      <img id="overlay" src="assets/drinks-overlay.png" alt="Drinks Logo Overlay" />
-      <canvas id="imageCanvas"></canvas>
-    </div>
-
-    <div id="result"></div>
-
-    <footer>
-      <p>Built by <a href="https://designateddrinks.github.io" target="_blank">Designated Drinks</a></p>
-    </footer>
+    <div id="resultText"></div>
   </div>
 
   <script src="script.js"></script>
