@@ -3,17 +3,23 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Inter', sans-serif;
   background-color: #121212;
   color: #f5f5f5;
+  font-family: 'Inter', sans-serif;
   text-align: center;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 40px 20px;
 }
 
 h1 {
   font-family: 'Anton', sans-serif;
   font-size: 3em;
   color: #f9cc50;
-  margin-top: 40px;
+  margin-bottom: 10px;
 }
 
 p {
@@ -22,18 +28,12 @@ p {
   margin-bottom: 30px;
 }
 
-.container {
-  max-width: 600px;
-  margin: auto;
-  padding: 20px;
-}
-
 #heroImage {
   width: 100%;
   max-width: 320px;
-  border-radius: 8px;
+  border-radius: 10px;
   margin-bottom: 30px;
-  box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
 }
 
 input[type="file"] {
@@ -45,7 +45,7 @@ input[type="file"] {
   border-radius: 6px;
   cursor: pointer;
   margin-top: 10px;
-  transition: 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out;
 }
 
 input[type="file"]:hover {
@@ -60,8 +60,8 @@ canvas {
 }
 
 #scoreContainer {
-  font-size: 1.5em;
-  margin-top: 20px;
+  font-size: 1.6em;
+  margin-top: 25px;
   font-weight: bold;
   color: #f9cc50;
 }
