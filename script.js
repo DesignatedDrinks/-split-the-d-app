@@ -1,91 +1,92 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const imageUpload = document.getElementById('imageUpload');
-  const imageCanvas = document.getElementById('imageCanvas');
-  const ctx = imageCanvas.getContext('2d');
-  const analyzeBtn = document.getElementById('analyzeBtn');
-  const result = document.getElementById('result');
-  const beerName = document.getElementById('beerName');
-const ctx = canvas.getContext('2d');
-ctx.beginPath();
-ctx.moveTo(0, foamLineY); // foamLineY = calculated beer level
-ctx.lineTo(canvas.width, foamLineY);
-ctx.strokeStyle = 'red';
-ctx.lineWidth = 3;
-ctx.stroke();
+let uploadedImage = null;
 
-  let uploadedImage = new Image();
+// Wait for DOM to load
+document.addEventListener("DOMContentLoaded", () => {
+  const fileInput = document.getElementById("imageUpload");
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+  const analyzeBtn = document.getElementById("analyzeBtn");
+  const resultText = document.getElementById("result");
+  const scoreText = document.getElementById("score");
 
-  // Handle image upload
-  imageUpload.addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
+  fileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
     const reader = new FileReader();
-    reader.onload = (e) => {
-      uploadedImage.onload = () => {
-        imageCanvas.width = uploadedImage.width;
-        imageCanvas.height = uploadedImage.height;
-        ctx.drawImage(uploadedImage, 0, 0);
+    reader.onload = function (event) {
+      const img = new Image();
+      img.onload = function () {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        uploadedImage = img;
       };
-      uploadedImage.src = e.target.result;
+      img.src = event.target.result;
     };
     reader.readAsDataURL(file);
   });
 
-  analyzeBtn.addEventListener('click', () => {
-    if (!uploadedImage.src) {
-      result.innerHTML = 'Please upload an image first.';
+  analyzeBtn.addEventListener("click", () => {
+    if (!uploadedImage || typeof cv === "undefined") {
+      alert("Image not loaded or OpenCV not ready.");
       return;
     }
 
-    const mat = cv.imread(imageCanvas);
+    // Draw the image again to ensure a clean canvas
+    ctx.drawImage(uploadedImage, 0, 0);
+
+    // Convert canvas to OpenCV Mat
+    let src = cv.imread(canvas);
     let gray = new cv.Mat();
-    let edges = new cv.Mat();
-    let lines = new cv.Mat();
+    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
 
-    // Convert to grayscale
-    cv.cvtColor(mat, gray, cv.COLOR_RGBA2GRAY, 0);
+    // Threshold to isolate foam
+    let binary = new cv.Mat();
+    cv.threshold(gray, binary, 200, 255, cv.THRESH_BINARY);
 
-    // Edge detection
-    cv.Canny(gray, edges, 50, 150);
-
-    // Line detection
-    cv.HoughLinesP(edges, lines, 1, Math.PI / 180, 100, 50, 10);
-
-    let beerLineY = null;
-    for (let i = 0; i < lines.rows; ++i) {
-      const [x1, y1, x2, y2] = lines.data32S.slice(i * 4, i * 4 + 4);
-      const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
-      if (Math.abs(angle) < 10) {
-        // This is a mostly horizontal line
-        beerLineY = (y1 + y2) / 2;
+    // Search for first strong horizontal white line (top-down)
+    let foamY = -1;
+    for (let y = 0; y < binary.rows; y++) {
+      let rowSum = 0;
+      for (let x = 0; x < binary.cols; x++) {
+        rowSum += binary.ucharPtr(y, x)[0];
+      }
+      if (rowSum / binary.cols > 200) {
+        foamY = y;
         break;
       }
     }
 
-    // Cleanup
-    gray.delete(); edges.delete(); lines.delete(); mat.delete();
+    // Draw red line for visualization
+    if (foamY !== -1) {
+      ctx.beginPath();
+      ctx.moveTo(0, foamY);
+      ctx.lineTo(canvas.width, foamY);
+      ctx.strokeStyle = "red";
+      ctx.lineWidth = 3;
+      ctx.stroke();
 
-    if (beerLineY !== null) {
-      const dLineY = imageCanvas.height * 0.64; // Assuming logo "D" is around 64% down the image
-      const distance = Math.abs(beerLineY - dLineY);
-      const score = Math.max(0, 100 - distance); // out of 100
+      // Assume ideal "D" line is at 42% height
+      const dY = Math.floor(canvas.height * 0.42);
+      const distance = Math.abs(foamY - dY);
+      const maxDistance = canvas.height * 0.25; // Acceptable tolerance
+      const score = Math.max(0, 100 - (distance / maxDistance) * 100);
 
-      let verdict = '';
-      if (score > 90) {
-        verdict = '🎯 NAILED IT.';
-      } else if (score > 75) {
-        verdict = '🍺 Solid split.';
-      } else if (score > 50) {
-        verdict = '⚠️ You tried… barely split.';
-      } else {
-        verdict = '🚫 Missed the D.';
-      }
+      resultText.textContent =
+        score >= 90
+          ? "✅ Nailed the D."
+          : score >= 60
+          ? "🟡 Close to the D."
+          : "❌ Missed the D.";
 
-      const name = beerName.value.trim() || 'your beer';
-      result.innerHTML = `<strong>${verdict}</strong><br><br>${name} scored <b>${Math.round(score)}%</b>`;
+      scoreText.textContent = `your beer scored ${score.toFixed(0)}%`;
     } else {
-      result.innerHTML = 'Could not detect beer line. Try a clearer image.';
+      resultText.textContent = "❌ Couldn't find foam line.";
+      scoreText.textContent = "your beer scored 0%";
     }
+
+    // Cleanup
+    src.delete();
+    gray.delete();
+    binary.delete();
   });
 });
