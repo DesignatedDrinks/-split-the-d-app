@@ -10,22 +10,20 @@
   <div class="container">
     <h1>Split the D</h1>
     <p>Take your first drink. Upload the proof. Line it up with the D. Score it.</p>
-
     <input type="file" id="imageUpload" accept="image/*" />
     <input type="text" id="beerName" placeholder="What beer are you drinking?" />
 
     <div class="image-wrapper">
       <canvas id="imageCanvas"></canvas>
       <img id="uploadedImage" src="" alt="Uploaded Pour" style="display: none;" />
-      <img id="overlay" src="assets/drinks-overlay.png" alt="Overlay Logo" />
+      <img id="overlay" src="assets/drinks-overlay.png" alt="Logo Overlay" />
     </div>
 
-    <div id="tap-instruction" style="display: none;">
+    <div id="tap-instruction" style="display:none;">
       <p>📍 Tap where the beer line is.</p>
     </div>
 
     <button id="analyzeBtn">Analyze Pour</button>
-
     <div id="result"></div>
   </div>
 
@@ -33,8 +31,7 @@
     <a href="https://designateddrinks.github.io" target="_blank">designateddrinks.github.io</a>
   </footer>
 
-  <script async src="https://docs.opencv.org/4.8.0/opencv.js"></script>
-
+  <script async src="https://docs.opencv.org/4.5.5/opencv.js" onload="onOpenCvReady();"></script>
   <script src="script.js"></script>
 </body>
 </html>
