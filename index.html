@@ -2,35 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Split the D</title>
   <link rel="stylesheet" href="style.css" />
-  <script async src="https://docs.opencv.org/4.x/opencv.js"></script>
 </head>
 <body>
   <div class="container">
     <h1>Split the D</h1>
-    <p>Take your first drink. Upload the proof. Did you split the D?</p>
-
+    <p>Take your first drink. Upload the proof. Line it up with the D. Score it.</p>
     <input type="file" id="imageUpload" accept="image/*" />
     <input type="text" id="beerName" placeholder="What beer are you drinking?" />
 
     <div class="image-wrapper">
-      <canvas id="imageCanvas"></canvas>
+      <canvas id="canvas"></canvas>
     </div>
 
-    <div id="tap-instruction" style="display:none;">
-      <p>📍 Tap where the beer line is.</p>
-    </div>
-
-    <button id="analyzeBtn">Analyze Pour</button>
+    <button id="analyzeBtn" disabled>Analyze Pour</button>
     <div id="result"></div>
+    <div id="score"></div>
   </div>
 
   <footer>
     <a href="https://designateddrinks.github.io" target="_blank">designateddrinks.github.io</a>
   </footer>
 
+  <script async src="https://docs.opencv.org/4.x/opencv.js" onload="onOpenCvReady()"></script>
+  <script>
+    function onOpenCvReady() {
+      if (typeof cv !== 'undefined') {
+        console.log("✅ OpenCV.js loaded");
+        document.getElementById("analyzeBtn").disabled = false;
+      } else {
+        console.error("❌ OpenCV.js failed to load");
+      }
+    }
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
