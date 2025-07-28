@@ -1,81 +1,78 @@
-document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
-document.getElementById('analyzeBtn').addEventListener('click', analyzeImage);
+// script.js
 
-let uploadedImg = null;
+let imgElement = document.getElementById('uploaded-image');
+let inputElement = document.getElementById('image-input');
+let resultElement = document.getElementById('result');
+let canvas = document.createElement('canvas');
+let ctx = canvas.getContext('2d');
 
-function handleImageUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+inputElement.addEventListener('change', function (e) {
+  let file = e.target.files[0];
+  let reader = new FileReader();
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const img = new Image();
-    img.onload = function () {
-      uploadedImg = img;
-      const canvas = document.getElementById('imageCanvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-    };
-    img.src = e.target.result;
+  reader.onload = function (event) {
+    imgElement.src = event.target.result;
   };
+
   reader.readAsDataURL(file);
-}
+});
 
-function analyzeImage() {
-  if (!uploadedImg || !cv || !cv.imread) {
-    alert("Image not loaded or OpenCV not ready.");
-    return;
-  }
+document.getElementById('analyze-btn').addEventListener('click', async function () {
+  resultElement.innerHTML = '🔍 Analyzing...';
 
-  const canvas = document.getElementById('imageCanvas');
-  const src = cv.imread(canvas);
+  // Wait for OpenCV to load and the image to render
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  canvas.width = imgElement.width;
+  canvas.height = imgElement.height;
+  ctx.drawImage(imgElement, 0, 0);
+
+  let src = cv.imread(canvas);
   let gray = new cv.Mat();
-  let blurred = new cv.Mat();
   let edges = new cv.Mat();
 
-  // Pre-process the image
-  cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-  cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
-  cv.Canny(blurred, edges, 50, 150);
+  // Convert to grayscale
+  cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
 
-  // Find contours
+  // Edge detection
+  cv.Canny(gray, edges, 50, 150);
+
+  // Detect contours (foam line)
   let contours = new cv.MatVector();
   let hierarchy = new cv.Mat();
   cv.findContours(edges, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
 
-  let bestY = null;
-
+  let foamY = null;
   for (let i = 0; i < contours.size(); i++) {
     let cnt = contours.get(i);
     let rect = cv.boundingRect(cnt);
-    let aspectRatio = rect.width / rect.height;
 
-    // Look for wide horizontal lines near the middle of the glass
-    if (rect.width > src.cols * 0.4 && aspectRatio > 3) {
-      if (!bestY || rect.y < bestY) {
-        bestY = rect.y + rect.height / 2;
-      }
+    // Pick horizontal contours in the middle-upper section (approx height of logo)
+    if (rect.width > src.cols * 0.6 && rect.y > src.rows * 0.3 && rect.y < src.rows * 0.6) {
+      foamY = rect.y;
+      break;
     }
-    cnt.delete();
   }
 
-  contours.delete(); hierarchy.delete(); gray.delete(); blurred.delete(); edges.delete(); src.delete();
+  // Set reference Y for "middle of the D" using best sample
+  let dMiddleY = Math.floor(src.rows * 0.435); // based on sample image you provided
 
-  const canvasHeight = canvas.height;
-  const overlayD_Y = canvasHeight * 0.73; // estimated position of 'D' line
+  let diff = foamY !== null ? Math.abs(foamY - dMiddleY) : null;
+  let threshold = 15;
 
-  if (bestY !== null) {
-    const diff = Math.abs(bestY - overlayD_Y);
-    let score;
-    if (diff < 5) score = "🎯 Perfect! Nailed it.";
-    else if (diff < 15) score = "👌 Pretty damn close.";
-    else if (diff < 30) score = "👍 Not bad. You’re close to the D.";
-    else score = "👎 Way off. Try again.";
-
-    document.getElementById('result').innerText = score;
+  if (foamY === null) {
+    resultElement.innerHTML = '❌ Couldn\'t detect foam line. Try again with clearer image.';
+  } else if (diff <= threshold) {
+    resultElement.innerHTML = '🍻 Perfect Split! Nailed it.';
+  } else if (diff <= threshold * 2) {
+    resultElement.innerHTML = '👍 Close! Almost split the D.';
   } else {
-    document.getElementById('result').innerText = "⚠️ Couldn't detect the beer line.";
+    resultElement.innerHTML = '👎 Way off. Try again.';
   }
-}
+
+  src.delete();
+  gray.delete();
+  edges.delete();
+  contours.delete();
+  hierarchy.delete();
+});
