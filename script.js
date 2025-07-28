@@ -1,78 +1,92 @@
-// script.js
+document.addEventListener('DOMContentLoaded', function () {
+  console.log("DOM fully loaded");
 
-let imgElement = document.getElementById('uploaded-image');
-let inputElement = document.getElementById('image-input');
-let resultElement = document.getElementById('result');
-let canvas = document.createElement('canvas');
-let ctx = canvas.getContext('2d');
+  const imageUpload = document.getElementById('imageUpload');
+  const uploadedImage = document.getElementById('uploadedImage');
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  const result = document.getElementById('result');
 
-inputElement.addEventListener('change', function (e) {
-  let file = e.target.files[0];
-  let reader = new FileReader();
+  let imageLoaded = false;
 
-  reader.onload = function (event) {
-    imgElement.src = event.target.result;
-  };
+  imageUpload.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  reader.readAsDataURL(file);
-});
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      uploadedImage.src = event.target.result;
+      uploadedImage.onload = function () {
+        imageLoaded = true;
+        console.log("Image loaded and displayed");
+      };
+    };
+    reader.readAsDataURL(file);
+  });
 
-document.getElementById('analyze-btn').addEventListener('click', async function () {
-  resultElement.innerHTML = '🔍 Analyzing...';
-
-  // Wait for OpenCV to load and the image to render
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  canvas.width = imgElement.width;
-  canvas.height = imgElement.height;
-  ctx.drawImage(imgElement, 0, 0);
-
-  let src = cv.imread(canvas);
-  let gray = new cv.Mat();
-  let edges = new cv.Mat();
-
-  // Convert to grayscale
-  cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
-
-  // Edge detection
-  cv.Canny(gray, edges, 50, 150);
-
-  // Detect contours (foam line)
-  let contours = new cv.MatVector();
-  let hierarchy = new cv.Mat();
-  cv.findContours(edges, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-
-  let foamY = null;
-  for (let i = 0; i < contours.size(); i++) {
-    let cnt = contours.get(i);
-    let rect = cv.boundingRect(cnt);
-
-    // Pick horizontal contours in the middle-upper section (approx height of logo)
-    if (rect.width > src.cols * 0.6 && rect.y > src.rows * 0.3 && rect.y < src.rows * 0.6) {
-      foamY = rect.y;
-      break;
+  analyzeBtn.addEventListener('click', () => {
+    if (!imageLoaded) {
+      result.innerText = "Please upload a photo first.";
+      return;
     }
-  }
 
-  // Set reference Y for "middle of the D" using best sample
-  let dMiddleY = Math.floor(src.rows * 0.435); // based on sample image you provided
+    // Convert image to canvas
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = uploadedImage.naturalWidth;
+    canvas.height = uploadedImage.naturalHeight;
+    ctx.drawImage(uploadedImage, 0, 0);
 
-  let diff = foamY !== null ? Math.abs(foamY - dMiddleY) : null;
-  let threshold = 15;
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-  if (foamY === null) {
-    resultElement.innerHTML = '❌ Couldn\'t detect foam line. Try again with clearer image.';
-  } else if (diff <= threshold) {
-    resultElement.innerHTML = '🍻 Perfect Split! Nailed it.';
-  } else if (diff <= threshold * 2) {
-    resultElement.innerHTML = '👍 Close! Almost split the D.';
-  } else {
-    resultElement.innerHTML = '👎 Way off. Try again.';
-  }
+    if (typeof cv === 'undefined') {
+      console.error("OpenCV is not loaded yet.");
+      result.innerText = "Error: OpenCV not ready.";
+      return;
+    }
 
-  src.delete();
-  gray.delete();
-  edges.delete();
-  contours.delete();
-  hierarchy.delete();
+    console.log("OpenCV is ready. Starting analysis...");
+
+    let src = cv.matFromImageData(imageData);
+    let gray = new cv.Mat();
+    let edges = new cv.Mat();
+
+    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+    cv.Canny(gray, edges, 50, 150);
+
+    // Basic beer line detection logic
+    let height = edges.rows;
+    let lineY = -1;
+
+    for (let y = height - 1; y >= 0; y--) {
+      let rowSum = 0;
+      for (let x = 0; x < edges.cols; x++) {
+        rowSum += edges.ucharPtr(y, x)[0];
+      }
+      if (rowSum > edges.cols * 10) {
+        lineY = y;
+        break;
+      }
+    }
+
+    if (lineY === -1) {
+      result.innerText = "Couldn't find beer line. Try another photo.";
+    } else {
+      console.log("Detected beer line at Y =", lineY);
+
+      const dLineY = Math.floor(canvas.height * 0.52); // You can tune this number
+      const tolerance = canvas.height * 0.02;
+
+      if (Math.abs(lineY - dLineY) <= tolerance) {
+        result.innerText = "🍻 Nailed it. You split the D!";
+      } else if (lineY < dLineY) {
+        result.innerText = "👆 Too high. Try again.";
+      } else {
+        result.innerText = "👇 Too low. Try again.";
+      }
+    }
+
+    src.delete();
+    gray.delete();
+    edges.delete();
+  });
 });
