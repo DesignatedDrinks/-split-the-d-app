@@ -5,6 +5,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const analyzeBtn = document.getElementById('analyzeBtn');
   const result = document.getElementById('result');
   const beerName = document.getElementById('beerName');
+const ctx = canvas.getContext('2d');
+ctx.beginPath();
+ctx.moveTo(0, foamLineY); // foamLineY = calculated beer level
+ctx.lineTo(canvas.width, foamLineY);
+ctx.strokeStyle = 'red';
+ctx.lineWidth = 3;
+ctx.stroke();
 
   let uploadedImage = new Image();
 
