@@ -1,116 +1,122 @@
-/* Reset and Base */
+/* Brand Colors (based on uploaded palette) */
+:root {
+  --primary: #272727;        /* Deep charcoal for background */
+  --secondary: #f7f7f7;      /* Light background */
+  --accent: #e3002b;         /* Designated Drinks red */
+  --text: #ffffff;           /* Clean white */
+  --muted: #bbbbbb;          /* Subtle gray */
+  --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
-  font-family: 'Helvetica Neue', sans-serif;
 }
 
 body {
-  background-color: #f9f9f9;
-  color: #1b1b1b;
-  text-align: center;
-  padding: 2rem 1rem;
-  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-main);
+  background-color: var(--primary);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding: 20px;
 }
 
-/* Header */
 h1 {
   font-size: 2.5rem;
-  margin-bottom: 0.5rem;
-  color: #122c3f; /* Navy from your brand */
+  color: var(--accent);
+  margin-bottom: 0.2em;
 }
 
 p {
-  margin-bottom: 1rem;
-  color: #444;
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin: 0.5em 0;
+  text-align: center;
 }
 
-/* Container */
 .container {
   max-width: 500px;
-  margin: auto;
-  background: #ffffff;
+  width: 100%;
+  background-color: var(--secondary);
+  color: var(--primary);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  padding: 2rem;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  margin-top: 40px;
+  text-align: center;
 }
 
-/* Inputs */
 input[type="file"],
 input[type="text"] {
-  margin: 0.75rem 0;
-  padding: 0.6rem;
   width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  margin-bottom: 20px;
   font-size: 1rem;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  background-color: #f0f0f0;
+}
+
+button#analyzeBtn {
+  padding: 14px 24px;
+  font-size: 1.1rem;
+  background-color: var(--accent);
+  color: var(--text);
+  border: none;
   border-radius: 8px;
-  border: 2px solid #d9d9d9;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
 }
 
-input[type="text"] {
-  border-color: #1b4f72; /* Accent blue */
+button#analyzeBtn:hover {
+  background-color: #b10020;
 }
 
-/* Image canvas */
 .image-wrapper {
   position: relative;
-  margin-top: 1rem;
+  width: 100%;
+  margin-top: 20px;
 }
 
 canvas#imageCanvas {
   max-width: 100%;
   width: 100%;
   border-radius: 10px;
-  border: 2px solid #ccc;
+  border: 2px solid var(--muted);
 }
 
 img#overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  opacity: 0.85;
+  display: none; /* no longer needed if doing CV detection */
 }
 
-/* Instructions */
-#tap-instruction p {
-  margin-top: 1rem;
-  font-weight: bold;
-  color: #c94f4f;
-}
-
-/* Buttons */
-button {
-  background-color: #122c3f;
-  color: white;
-  padding: 0.8rem 1.5rem;
-  margin-top: 1.5rem;
-  border: none;
-  border-radius: 10px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-button:hover {
-  background-color: #1b4f72;
-}
-
-/* Results */
 #result {
-  margin-top: 1.5rem;
   font-size: 1.2rem;
-  font-weight: 600;
+  font-weight: bold;
+  margin-top: 20px;
+  color: var(--primary);
 }
 
-/* Footer */
 footer {
-  margin-top: 3rem;
+  margin-top: 40px;
   font-size: 0.9rem;
-  color: #aaa;
+  color: var(--muted);
+  text-align: center;
 }
 
 footer a {
+  color: var(--muted);
   text-decoration: none;
-  color: #555;
+  font-weight: bold;
+}
+
+footer a:hover {
+  color: var(--accent);
 }
