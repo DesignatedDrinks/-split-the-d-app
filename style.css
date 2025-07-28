@@ -1,102 +1,116 @@
-body {
+/* Reset and Base */
+* {
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #000;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  box-sizing: border-box;
+  font-family: 'Helvetica Neue', sans-serif;
 }
 
-.container {
-  padding: 2rem 1rem;
-  max-width: 500px;
-  margin: 0 auto;
+body {
+  background-color: #f9f9f9;
+  color: #1b1b1b;
   text-align: center;
+  padding: 2rem 1rem;
+  font-size: 16px;
 }
 
+/* Header */
 h1 {
-  font-size: 2rem;
-  color: #FFD700; /* Yellow Title */
+  font-size: 2.5rem;
   margin-bottom: 0.5rem;
+  color: #122c3f; /* Navy from your brand */
 }
 
 p {
-  color: #ccc;
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  color: #444;
 }
 
+/* Container */
+.container {
+  max-width: 500px;
+  margin: auto;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 2rem;
+}
+
+/* Inputs */
 input[type="file"],
 input[type="text"] {
-  display: block;
-  margin: 0.5rem auto 1rem;
-  padding: 0.75rem;
+  margin: 0.75rem 0;
+  padding: 0.6rem;
   width: 100%;
-  max-width: 100%;
-  border-radius: 8px;
-  border: 1px solid #444;
-  background-color: #111;
-  color: #fff;
   font-size: 1rem;
+  border-radius: 8px;
+  border: 2px solid #d9d9d9;
 }
 
-input[type="text"]::placeholder {
-  color: #666;
+input[type="text"] {
+  border-color: #1b4f72; /* Accent blue */
 }
 
+/* Image canvas */
 .image-wrapper {
   position: relative;
-  margin-bottom: 1rem;
+  margin-top: 1rem;
 }
 
-#imageCanvas {
+canvas#imageCanvas {
+  max-width: 100%;
   width: 100%;
-  border-radius: 8px;
+  border-radius: 10px;
+  border: 2px solid #ccc;
 }
 
-#overlay {
+img#overlay {
   position: absolute;
   top: 0;
   left: 0;
-  opacity: 0.75;
   pointer-events: none;
-  border-radius: 8px;
+  opacity: 0.85;
 }
 
-button {
-  background-color: #FFD700; /* Yellow CTA */
-  color: #000;
+/* Instructions */
+#tap-instruction p {
+  margin-top: 1rem;
   font-weight: bold;
-  padding: 0.75rem 1.5rem;
+  color: #c94f4f;
+}
+
+/* Buttons */
+button {
+  background-color: #122c3f;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  margin-top: 1.5rem;
   border: none;
-  border-radius: 8px;
-  cursor: pointer;
+  border-radius: 10px;
   font-size: 1rem;
-  transition: background-color 0.2s ease-in-out;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 button:hover {
-  background-color: #ffc107;
+  background-color: #1b4f72;
 }
 
+/* Results */
 #result {
-  margin-top: 1.25rem;
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #FFD700;
+  margin-top: 1.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
-#tap-instruction p {
-  color: #fff;
-  margin-bottom: 0.5rem;
-}
-
+/* Footer */
 footer {
-  margin-top: auto;
-  padding: 1rem;
-  text-align: center;
-  font-size: 0.875rem;
-  color: #777;
+  margin-top: 3rem;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+footer a {
+  text-decoration: none;
+  color: #555;
 }
